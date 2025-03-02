@@ -8,7 +8,7 @@ services:
       - postgres
       - redis
     environment:
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/jaja
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/iprobioDb
       REDIS_URL: redis://redis:6379
       NODE_ENV: development
       JWT_SECRET: ${JWT_SECRET}
@@ -36,7 +36,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: jaja
+      POSTGRES_DB: iprobioDb
       # Povolenie SSL
       POSTGRES_INITDB_ARGS: "--data-checksums"
     command: >

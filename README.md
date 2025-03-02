@@ -9,7 +9,7 @@ cd iprobio2
 ```
 2. env:
 ```bash
-cp env.template .env
+cp .env.template .env
 ```
 
 3. Vytvorenie SSL certifikátov:
@@ -41,7 +41,7 @@ docker-compose exec backend npx medusa user -e admin@example.com -p supersecret
 
 ### Chýbajúca databáza:
 ```bash
-docker-compose exec postgres psql -U postgres -c "CREATE DATABASE jaja"
+docker-compose exec postgres psql -U postgres -c "CREATE DATABASE iprobioDb"
 docker-compose restart backend
 ```
 
