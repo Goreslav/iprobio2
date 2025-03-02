@@ -1,62 +1,164 @@
-<p align="center">
-  <a href="https://www.medusajs.com">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/59018053/229103275-b5e482bb-4601-46e6-8142-244f531cebdb.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-    <img alt="Medusa logo" src="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-    </picture>
-  </a>
-</p>
-<h1 align="center">
-  Medusa
-</h1>
+# Iprobio2 - Dockerized Medusa.js E-commerce Project
 
-<h4 align="center">
-  <a href="https://docs.medusajs.com">Documentation</a> |
-  <a href="https://www.medusajs.com">Website</a>
-</h4>
+Tento projekt obsahuje dockerizovanú verziu [Medusa.js](https://medusajs.com/) e-commerce platformy, pripravenú na rýchle nasadenie a používanie. Projekt využíva PostgreSQL pre databázu a Redis pre cache a session management.
 
-<p align="center">
-  Building blocks for digital commerce
-</p>
-<p align="center">
-  <a href="https://github.com/medusajs/medusa/blob/master/CONTRIBUTING.md">
-    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat" alt="PRs welcome!" />
-  </a>
-    <a href="https://www.producthunt.com/posts/medusa"><img src="https://img.shields.io/badge/Product%20Hunt-%231%20Product%20of%20the%20Day-%23DA552E" alt="Product Hunt"></a>
-  <a href="https://discord.gg/xpCwq3Kfn8">
-    <img src="https://img.shields.io/badge/chat-on%20discord-7289DA.svg" alt="Discord Chat" />
-  </a>
-  <a href="https://twitter.com/intent/follow?screen_name=medusajs">
-    <img src="https://img.shields.io/twitter/follow/medusajs.svg?label=Follow%20@medusajs" alt="Follow @medusajs" />
-  </a>
-</p>
+## Požiadavky
 
-## Compatibility
+Pre spustenie tohto projektu potrebujete:
 
-This starter is compatible with versions >= 2 of `@medusajs/medusa`. 
+- [Docker](https://www.docker.com/products/docker-desktop/) (verzia 20.10.0+)
+- [Docker Compose](https://docs.docker.com/compose/install/) (verzia 2.0.0+)
+- Git
 
-## Getting Started
+## Inštalácia a spustenie
 
-Visit the [Quickstart Guide](https://docs.medusajs.com/learn/installation) to set up a server.
+### 1. Klonovanie repozitára
 
-Visit the [Docs](https://docs.medusajs.com/learn/installation#get-started) to learn more about our system requirements.
+```bash
+git clone git@github.com:Goreslav/iprobio2.git
+cd iprobio2
+```
 
-## What is Medusa
+### 2. Generovanie SSL certifikátov
 
-Medusa is a set of commerce modules and tools that allow you to build rich, reliable, and performant commerce applications without reinventing core commerce logic. The modules can be customized and used to build advanced ecommerce stores, marketplaces, or any product that needs foundational commerce primitives. All modules are open-source and freely available on npm.
+```bash
+# Nastavenie práv na spustenie
+chmod +x generate-ssl-certs.sh
 
-Learn more about [Medusa’s architecture](https://docs.medusajs.com/learn/introduction/architecture) and [commerce modules](https://docs.medusajs.com/learn/fundamentals/modules/commerce-modules) in the Docs.
+# Generovanie SSL certifikátov
+./generate-ssl-certs.sh
+```
 
-## Community & Contributions
+### 3. Spustenie aplikácie pomocou Docker Compose
 
-The community and core team are available in [GitHub Discussions](https://github.com/medusajs/medusa/discussions), where you can ask for support, discuss roadmap, and share ideas.
+```bash
+# Zostavenie a spustenie kontajnerov
+docker-compose up -d
+```
 
-Join our [Discord server](https://discord.com/invite/medusajs) to meet other community members.
+### 4. Sledovanie logov (voliteľné)
 
-## Other channels
+```bash
+docker-compose logs -f
+```
 
-- [GitHub Issues](https://github.com/medusajs/medusa/issues)
-- [Twitter](https://twitter.com/medusajs)
-- [LinkedIn](https://www.linkedin.com/company/medusajs)
-- [Medusa Blog](https://medusajs.com/blog/)
+### 5. Vytvorenie administrátorského účtu
+
+Po úspešnom spustení všetkých kontajnerov vytvorte admin používateľa:
+
+```bash
+docker-compose exec backend npx medusa user -e admin@example.com -p supersecret
+```
+
+Prihlasovacie údaje (odporúčame zmeniť pri prvom prihlásení):
+- Email: admin@example.com
+- Heslo: supersecret
+
+## Prístup k aplikácii
+
+- **Medusa Admin Panel**: http://localhost:9000/app
+- **Medusa API**: http://localhost:9000
+
+## Štruktúra projektu
+
+```
+iprobio2/
+├── .dockerignore          # Súbory ignorované pri zostavovaní Docker image
+├── .env                   # Konfiguračné premenné prostredia
+├── .gitignore             # Súbory ignorované Gitom
+├── Dockerfile             # Definícia Docker image pre Medusa
+├── docker-compose.yml     # Konfigurácia Docker služieb
+├── docker-entrypoint.sh   # Entrypoint skript pre bezpečné spustenie aplikácie
+├── generate-ssl-certs.sh  # Skript na generovanie SSL certifikátov
+├── src/                   # Zdrojový kód Medusa aplikácie
+│   ├── admin/             # Prispôsobenia admin rozhrania
+│   ├── api/               # Vlastné API endpointy
+│   ├── modules/           # Vlastné moduly
+│   └── ...
+└── medusa-config.ts       # Hlavný konfiguračný súbor Medusa
+```
+
+## Docker kontajnery
+
+Projekt používa nasledujúce Docker kontajnery:
+
+- **backend** (Medusa.js server)
+- **postgres** (PostgreSQL databáza)
+- **redis** (Redis server)
+
+## Užitočné príkazy
+
+```bash
+# Reštartovanie aplikácie
+docker-compose restart
+
+# Zastavenie aplikácie
+docker-compose down
+
+# Zastavenie aplikácie a odstránenie všetkých dát (POZOR, vymaže databázu)
+docker-compose down -v
+
+# Zobrazenie logov konkrétneho kontajnera
+docker-compose logs -f backend
+docker-compose logs -f postgres
+docker-compose logs -f redis
+
+# Prístup do shellu kontajnera
+docker-compose exec backend sh
+docker-compose exec postgres sh
+docker-compose exec redis sh
+```
+
+## Konfigurácia
+
+Základné nastavenia sú v `.env` súbore. Pre produkčné nasadenie je potrebné zmeniť JWT_SECRET a COOKIE_SECRET na bezpečné hodnoty.
+
+## Aktualizácia
+
+Pre aktualizáciu projektu na najnovšiu verziu Medusa:
+
+```bash
+# Zastavenie kontajnerov
+docker-compose down
+
+# Aktualizácia repozitára
+git pull
+
+# Zostavenie nových kontajnerov
+docker-compose build --no-cache
+
+# Spustenie aktualizovaných kontajnerov
+docker-compose up -d
+```
+
+## Riešenie problémov
+
+### Problém s pripojením k databáze
+
+Ak máte problém s pripojením k databáze:
+
+```bash
+# Skontrolujte logy
+docker-compose logs -f postgres
+docker-compose logs -f backend
+
+# Reštartujte kontajnery
+docker-compose restart
+```
+
+### Problém s migráciami
+
+```bash
+# Spustite migrácie manuálne
+docker-compose exec backend npx medusa db:migrate
+```
+
+## Licencia
+
+Tento projekt je licencovaný pod [MIT Licenciou](https://opensource.org/licenses/MIT).
+
+## Podpora
+
+Pre ďalšiu pomoc a informácie o Medusa.js navštívte:
+- [Oficiálna dokumentácia Medusa](https://docs.medusajs.com/)
+- [Medusa GitHub](https://github.com/medusajs/medusa)
