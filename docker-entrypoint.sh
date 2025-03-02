@@ -17,9 +17,15 @@ fi
 # Give PostgreSQL a bit more time to initialize
 sleep 5
 
-# Check if database is initialized (check if a core table exists)
+# Create database if it doesn't exist
+echo "Checking if database exists and creating if needed..."
+PGPASSWORD=postgres psql -h postgres -U postgres -c "SELECT 1 FROM pg_database WHERE datname = 'jaja'" | grep -q 1 || PGPASSWORD=postgres psql -h postgres -U postgres -c "CREATE DATABASE jaja"
+
+# Create dummy table to check if we can connect
 echo "Checking if database is initialized..."
 PGPASSWORD=postgres psql -h postgres -U postgres -d jaja -c "CREATE TABLE IF NOT EXISTS dummy_check (id SERIAL PRIMARY KEY);" || true
+
+# Run migrations
 echo "Running migrations to ensure database is properly set up..."
 npx medusa db:migrate
 

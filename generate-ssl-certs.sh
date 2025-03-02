@@ -10,8 +10,8 @@ openssl req -new -x509 -days 365 -nodes \
   -keyout ./ssl/server.key \
   -subj "/C=SK/ST=State/L=City/O=Organization/CN=localhost"
 
-# Set appropriate permissions
-chmod 600 ./ssl/server.key
-chmod 644 ./ssl/server.crt
+# Set appropriate permissions - PostgreSQL requires very strict permissions
+chmod 600 ./ssl/server.key  # Only owner can read/write
+chmod 644 ./ssl/server.crt  # World readable but only owner can write
 
 echo "SSL certificates created successfully in ./ssl directory"
