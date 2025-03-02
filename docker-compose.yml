@@ -1,0 +1,97 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: medusa-server
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/jaja
+      REDIS_URL: redis://redis:6379
+      NODE_ENV: development
+      JWT_SECRET: ${JWT_SECRET}
+      COOKIE_SECRET: ${COOKIE_SECRET}
+      MEDUSA_ADMIN_ONBOARDING_TYPE: ${MEDUSA_ADMIN_ONBOARDING_TYPE}
+      STORE_CORS: ${STORE_CORS}
+      ADMIN_CORS: ${ADMIN_CORS}
+      AUTH_CORS: ${AUTH_CORS}
+    ports:
+      - "9000:9000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - medusa-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: medusa-postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: jaja
+      # Povolenie SSL
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    command: >
+      -c ssl=on
+      -c ssl_cert_file=/var/lib/postgresql/server.crt
+      -c ssl_key_file=/var/lib/postgresql/server.key
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./ssl:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+    networks:
+      - medusa-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: medusa-redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - medusa-network
+
+  # Uncomment if you also want to dockerize the storefront
+  # storefront:
+  #   build:
+  #     context: ../my-medusa-store-storefront # Adjust path as needed
+  #     dockerfile: Dockerfile.storefront
+  #   container_name: medusa-storefront
+  #   depends_on:
+  #     - backend
+  #   ports:
+  #     - "8000:8000"
+  #   networks:
+  #     - medusa-network
+
+volumes:
+  postgres-data:
+  redis-data:
+
+networks:
+  medusa-network:
+    driver: bridge
+
+  # Health checks to ensure services are properly started
+  # Uncomment and adjust as needed
+  # backend:
+  #   healthcheck:
+  #     test: ["CMD", "wget", "--spider", "http://localhost:9000/health"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3

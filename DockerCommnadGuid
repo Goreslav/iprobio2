@@ -1,0 +1,26 @@
+# Zjednodušené inštrukcie na spustenie Medusa v Dockeri
+
+## Kroky na opätovné spustenie:
+
+1. Zastavte existujúce kontajnery:
+   ```bash
+   docker-compose down
+   ```
+
+2. Zostavte a spustite znova:
+   ```bash
+   docker-compose build --no-cache backend
+   docker-compose up -d
+   ```
+
+3. Pozrite si logy, aby ste skontrolovali, či sa Medusa správne spustila:
+   ```bash
+   docker-compose logs -f
+   ```
+
+4. Keď sa server úspešne spustí, vytvorte admin používateľa:
+   ```bash
+   docker-compose exec backend npx medusa user -e admin@example.com -p supersecret
+   ```
+
+5. Otvorte admin rozhranie na http://localhost:9000/app
