@@ -1,0 +1,41 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Povolenie Corepacku
+RUN corepack enable
+
+# Potrebné knižnice pre kompiláciu
+RUN apk add --no-cache python3 make g++ git
+
+# Skopíruj len package.json a lock súbory na optimalizáciu cache
+COPY package.json .
+COPY yarn.lock .
+COPY .yarnrc.yml* .
+
+# Inicializácia Yarn 4 a inštalácia s prídavnými parametrami pre architektúru
+RUN mkdir -p .yarn/releases && \
+    yarn set version 4.6.0 && \
+    YARN_ENABLE_IMMUTABLE_INSTALLS=false \
+    yarn install
+
+# Skopírovanie celého projektu
+COPY . .
+
+# Vytvorenie .env súboru pre vite, ak ešte neexistuje
+RUN if [ ! -f .env ]; then \
+        echo "MEDUSA_BACKEND_URL=http://localhost:9000" > .env; \
+        echo "ADMIN_PATH=/app" >> .env; \
+    fi
+
+# Exponovanie portu pre Vite
+EXPOSE 5173
+
+# Nastavenie premenných prostredia pre spustenie
+ENV HOST=0.0.0.0
+ENV PORT=5173
+ENV MEDUSA_BACKEND_URL=http://localhost:9000
+ENV ADMIN_PATH=/app
+
+# Spustenie Vite servera
+CMD ["yarn", "dev"]

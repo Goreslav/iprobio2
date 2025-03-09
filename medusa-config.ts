@@ -22,4 +22,7 @@ module.exports = defineConfig({
       },
     },
   ],
+  admin: {
+    path: "/app",
+  },
 })

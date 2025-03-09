@@ -17,6 +17,10 @@ services:
       STORE_CORS: ${STORE_CORS}
       ADMIN_CORS: ${ADMIN_CORS}
       AUTH_CORS: ${AUTH_CORS}
+      ADMIN_PATH: /app
+      MEDUSA_ADMIN_PORT: 5173
+      PORT: 9000
+
     ports:
       - "9000:9000"
     volumes:
@@ -66,6 +70,37 @@ services:
     networks:
       - medusa-network
 
+  vite:
+    build:
+      context: .
+      dockerfile: Dockerfile.vite
+    container_name: medusa-vite
+    working_dir: /app
+    volumes:
+      - .:/app
+      - node_modules_vite:/app/node_modules
+    ports:
+      - "5173:5173"
+      - "46275:46275"  # Pridaný port pre Vite WebSocket
+    environment:
+      - NODE_ENV=development
+      - MEDUSA_BACKEND_URL=http://localhost:9000
+      - ADMIN_PATH=/app
+      - PORT=5173
+      - MEDUSA_ADMIN_PORT=5173
+      - CHOKIDAR_USEPOLLING=true
+      - VITE_HMR_PORT=5173
+      - VITE_HMR_HOSTNAME=localhost
+      - VITE_HMR_PROTOCOL=ws
+      - VITE_WS_PORT=5173
+    networks:
+      - medusa-network
+    depends_on:
+      - backend
+    # Pridanie presmerovania pre DNS medzi kontajnermi
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
   # Uncomment if you also want to dockerize the storefront
   # storefront:
   #   build:
@@ -82,6 +117,7 @@ services:
 volumes:
   postgres-data:
   redis-data:
+  node_modules_vite:  # Nový volume pre vite node_modules
 
 networks:
   medusa-network:

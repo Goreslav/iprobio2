@@ -15,15 +15,15 @@ COPY package-lock.json* .
 COPY pnpm-lock.yaml* .
 COPY .yarnrc.yml* .
 
-# Install dependencies based on the preferred package manager
-RUN if [ -f yarn.lock ]; then \
-      if [ -f .yarnrc.yml ]; then \
-        # For Yarn 2+ (Berry) with Corepack
-        corepack prepare yarn@4.6.0 --activate && yarn install; \
-      else \
-        # For Yarn 1.x
-        yarn install --frozen-lockfile; \
-      fi; \
+# Inicializácia Yarn 4 (vytvoriť .yarn adresár)
+RUN if [ -f yarn.lock ] && [ -f .yarnrc.yml ]; then \
+      # Vytvorenie .yarn adresára a potrebných súborov
+      mkdir -p .yarn/releases && \
+      yarn set version 4.6.0 && \
+      yarn install; \
+    elif [ -f yarn.lock ]; then \
+      # For Yarn 1.x
+      yarn install --frozen-lockfile; \
     elif [ -f package-lock.json ]; then npm ci; \
     elif [ -f pnpm-lock.yaml ]; then corepack prepare pnpm@latest --activate && pnpm i; \
     else npm i; \
@@ -48,4 +48,4 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Start the app with our entrypoint script
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["npm", "run", "start"]
+CMD ["yarn", "start"]

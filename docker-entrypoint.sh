@@ -46,6 +46,20 @@ npx medusa db:migrate
 echo "Syncing database links..."
 npx medusa db:sync-links
 
+# Create admin user if not exists
+echo "Checking for admin user and creating if needed..."
+ADMIN_EMAIL=${ADMIN_EMAIL:-"admin@example.com"}
+ADMIN_PASSWORD=${ADMIN_PASSWORD:-"supersecret"}
+
+# Check if user exists
+USER_EXISTS=$(PGPASSWORD=postgres psql -h postgres -U postgres -d iprobioDb -t -c "SELECT COUNT(*) FROM user_ WHERE email='$ADMIN_EMAIL';" 2>/dev/null || echo "0")
+if [ "$USER_EXISTS" -eq "0" ] || [ -z "$USER_EXISTS" ]; then
+  echo "Creating admin user..."
+  npx medusa user --email $ADMIN_EMAIL --password $ADMIN_PASSWORD || true
+else
+  echo "Admin user already exists."
+fi
+
 # Execute the original command
 echo "Starting Medusa server..."
 exec "$@"

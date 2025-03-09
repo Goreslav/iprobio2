@@ -29,11 +29,6 @@ docker-compose build --no-cache backend
 docker-compose up -d
 ```
 
-6. Vytvorenie admin používateľa:
-```bash
-docker-compose exec backend npx medusa user -e admin@example.com -p supersecret
-```
-
 7. Prístup k admin panelu:
    Otvorte http://localhost:9000/app a prihláste sa ako admin@example.com s heslom supersecret
 
